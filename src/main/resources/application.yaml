@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+#spring
+spring:
+  encoding:
+    charset: "UTF-8"
+  application:
+    name: "ps-cidades-estados-ibge"
+    version: "1.0.0"
+    description: "Api de listagem de cidades atualizadas"
