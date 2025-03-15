@@ -13,14 +13,14 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 
 @JacksonIntegrationTest
-public class EstadoResponseTest {
+class EstadoResponseTest {
 
     @Autowired
     private JacksonTester<List<EstadoResponse>> jacksonTester;
 
 
     @Test
-    public void testMarshall() throws IOException {
+    void testMarshall() throws IOException {
         final var estadosResponse = List.of(DataFaker.getEstados());
 
         final var actual = this.jacksonTester.write(estadosResponse);
