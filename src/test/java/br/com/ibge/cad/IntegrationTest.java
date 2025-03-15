@@ -1,10 +1,7 @@
 package br.com.ibge.cad;
 
 
-import br.com.ibge.cad.config.ObjectMapperConfig;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.test.context.ActiveProfiles;
 
