@@ -1,6 +1,6 @@
-package br.com.cperazzolli.cad.client;
+package br.com.ibge.cad.client;
 
-import br.com.cperazzolli.cad.exception.BusinessException;
+import br.com.ibge.cad.exception.BusinessException;
 
 public class ClientResponse<S,E> {
 

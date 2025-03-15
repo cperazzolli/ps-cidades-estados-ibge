@@ -1,7 +1,7 @@
-package br.com.cperazzolli.cad.client;
+package br.com.ibge.cad.client;
 
-import br.com.cperazzolli.cad.config.ObjectMapperConfig;
-import br.com.cperazzolli.cad.exception.RetryExhaustedException;
+import br.com.ibge.cad.config.ObjectMapperConfig;
+import br.com.ibge.cad.exception.RetryExhaustedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.common.util.StringUtils;
 import io.netty.channel.ChannelOption;

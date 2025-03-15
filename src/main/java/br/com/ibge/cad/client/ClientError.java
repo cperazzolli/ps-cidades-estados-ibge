@@ -1,4 +1,4 @@
-package br.com.cperazzolli.cad.client;
+package br.com.ibge.cad.client;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

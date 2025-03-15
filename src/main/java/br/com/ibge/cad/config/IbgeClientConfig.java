@@ -1,6 +1,6 @@
-package br.com.cperazzolli.cad.config;
+package br.com.ibge.cad.config;
 
-import br.com.cperazzolli.cad.client.BaseClientProperties;
+import br.com.ibge.cad.client.BaseClientProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;

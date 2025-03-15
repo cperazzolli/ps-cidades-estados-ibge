@@ -1,4 +1,4 @@
-package br.com.cperazzolli.cad.client;
+package br.com.ibge.cad.client;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
