@@ -1,4 +1,4 @@
-package br.com.cperazzolli.cad.exception;
+package br.com.ibge.cad.exception;
 
 public class RetryExhaustedException extends RuntimeException {
 

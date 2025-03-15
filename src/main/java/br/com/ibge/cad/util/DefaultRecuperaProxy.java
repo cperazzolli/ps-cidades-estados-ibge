@@ -1,4 +1,4 @@
-package br.com.cperazzolli.cad.util;
+package br.com.ibge.cad.util;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

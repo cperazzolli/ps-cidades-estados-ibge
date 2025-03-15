@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
 
 #spring
 spring:
@@ -9,3 +9,10 @@ spring:
     name: "ps-cidades-estados-ibge"
     version: "1.0.0"
     description: "Api de listagem de cidades atualizadas"
+
+
+application:
+  clients:
+    ibge:
+      estados-cidades:
+        baseUrl: "https://servicodados.ibge.gov.br/"
