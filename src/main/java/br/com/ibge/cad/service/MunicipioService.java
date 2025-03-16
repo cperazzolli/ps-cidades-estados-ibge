@@ -6,8 +6,6 @@ import br.com.ibge.cad.exception.BusinessException;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class MunicipioService {
 
@@ -18,7 +16,7 @@ public class MunicipioService {
         this.municipioClient = municipioClient;
     }
 
-    public List<MunicipioResponse> findMunicipio(final @NotBlank String uf) {
+    public MunicipioResponse findMunicipio(final @NotBlank String uf) {
 
         final var municipioResponse = municipioClient.execute(uf);
 

@@ -5,8 +5,6 @@ import br.com.ibge.cad.domain.EstadoResponse;
 import br.com.ibge.cad.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class EstadosService {
 
@@ -16,7 +14,7 @@ public class EstadosService {
         this.estadosClient = estadosClient;
     }
 
-    public List<EstadoResponse> findEstados() {
+    public EstadoResponse findEstados() {
 
         final var estadosResponse = estadosClient.find();
 

@@ -7,8 +7,6 @@ import br.com.ibge.cad.service.MunicipioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 public class IbgeEstadosCidadesResource implements IbgeEstadosCidadesOpenApi{
 
@@ -21,12 +19,12 @@ public class IbgeEstadosCidadesResource implements IbgeEstadosCidadesOpenApi{
     }
 
     @Override
-    public ResponseEntity<List<EstadoResponse>> findAllEstados() {
+    public ResponseEntity<EstadoResponse> findAllEstados() {
         return ResponseEntity.ok(estadosService.findEstados());
     }
 
     @Override
-    public ResponseEntity<List<MunicipioResponse>> findMunicipios(final String uf) {
+    public ResponseEntity<MunicipioResponse> findMunicipios(final String uf) {
         return ResponseEntity.ok(municipioService.findMunicipio(uf));
     }
 }
