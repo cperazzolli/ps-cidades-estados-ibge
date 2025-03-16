@@ -18,7 +18,7 @@ public class MunicipioService {
         this.municipioClient = municipioClient;
     }
 
-    public List<MunicipioResponse> findMunicipio(final @NotBlank String uf) {
+    public MunicipioResponse findMunicipio(final @NotBlank String uf) {
 
         final var municipioResponse = municipioClient.execute(uf);
 

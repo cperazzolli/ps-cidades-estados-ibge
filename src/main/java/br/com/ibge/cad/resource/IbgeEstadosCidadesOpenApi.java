@@ -28,7 +28,7 @@ public interface IbgeEstadosCidadesOpenApi {
             @ApiResponse(responseCode = "404", description = "Estados não encontrados",
                     content = @Content) })
     @GetMapping("/estados")
-    ResponseEntity<List<EstadoResponse>> findAllEstados();
+    ResponseEntity<EstadoResponse> findAllEstados();
 
     @Operation(summary = "Busca todos os municipios do Brasil")
     @ApiResponses(value = {
@@ -40,5 +40,5 @@ public interface IbgeEstadosCidadesOpenApi {
             @ApiResponse(responseCode = "404", description = "Municipios não encontrados",
                     content = @Content) })
     @GetMapping("/municipios/{UF}")
-    ResponseEntity<List<MunicipioResponse>> findMunicipios(@PathVariable("UF") String uf);
+    ResponseEntity<MunicipioResponse> findMunicipios(@PathVariable("UF") String uf);
 }

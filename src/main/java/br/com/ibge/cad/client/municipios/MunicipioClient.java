@@ -24,22 +24,19 @@ public class MunicipioClient extends WebClientTemplate {
         super(properties);
     }
 
-    public ClientResponse<List<MunicipioResponse>, ClientError> execute(@NotBlank String ufId) {
+    public ClientResponse<MunicipioResponse, ClientError> execute(@NotBlank String ufId) {
         try {
             final var municipioResponse = this.webClient.get()
                     .uri(uriBuilder -> uriBuilder.path("/api/v1/localidades/estados/{UF}/municipios")
                             .build(ufId))
                     .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<MunicipioResponse>>() {
+                    .bodyToMono(new ParameterizedTypeReference<MunicipioResponse>() {
                     })
                     .timeout(timeoutInSeconds())
                     .retryWhen(retryBackoffSpec())
                     .onErrorResume(WebClientResponseException.class, fallbackResponseException())
                     .block();
 
-            if (Objects.isNull(municipioResponse) || CollectionUtils.isEmpty(municipioResponse)) {
-                return ClientResponse.withSuccess(Collections.emptyList());
-            }
 
             return ClientResponse.withSuccess(municipioResponse);
         } catch (final WebClientResponseException ex) {

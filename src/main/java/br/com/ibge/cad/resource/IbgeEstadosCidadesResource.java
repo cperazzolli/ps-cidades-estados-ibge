@@ -21,12 +21,12 @@ public class IbgeEstadosCidadesResource implements IbgeEstadosCidadesOpenApi{
     }
 
     @Override
-    public ResponseEntity<List<EstadoResponse>> findAllEstados() {
+    public ResponseEntity<EstadoResponse> findAllEstados() {
         return ResponseEntity.ok(estadosService.findEstados());
     }
 
     @Override
-    public ResponseEntity<List<MunicipioResponse>> findMunicipios(final String uf) {
+    public ResponseEntity<MunicipioResponse> findMunicipios(final String uf) {
         return ResponseEntity.ok(municipioService.findMunicipio(uf));
     }
 }

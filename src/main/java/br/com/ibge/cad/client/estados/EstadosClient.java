@@ -23,22 +23,18 @@ public class EstadosClient extends WebClientTemplate {
         super(properties);
     }
 
-    public ClientResponse<List<EstadoResponse>,ClientError> find(){
+    public ClientResponse<EstadoResponse,ClientError> find(){
 
         try {
-            final List<EstadoResponse> estadosResponse = this.webClient.get()
+            final EstadoResponse estadosResponse = this.webClient.get()
                     .uri(uriBuilder -> uriBuilder.path("/api/v1/localidades/estados")
                     .build())
                     .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<EstadoResponse>>(){})
+                    .bodyToMono(new ParameterizedTypeReference<EstadoResponse>(){})
                     .timeout(timeoutInSeconds())
                     .retryWhen(retryBackoffSpec())
                     .onErrorResume(WebClientResponseException.class, fallbackResponseException())
                     .block();
-
-            if(Objects.isNull(estadosResponse) || CollectionUtils.isEmpty(estadosResponse)){
-                return ClientResponse.withSuccess(Collections.emptyList());
-            }
 
             return ClientResponse.withSuccess(estadosResponse);
         } catch(final WebClientResponseException ex) {

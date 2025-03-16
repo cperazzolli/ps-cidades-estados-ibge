@@ -16,7 +16,7 @@ public class EstadosService {
         this.estadosClient = estadosClient;
     }
 
-    public List<EstadoResponse> findEstados() {
+    public EstadoResponse findEstados() {
 
         final var estadosResponse = estadosClient.find();
 
