@@ -8,14 +8,9 @@ import br.com.ibge.cad.config.IbgeClientConfig.IbgeClientProperties;
 import br.com.ibge.cad.domain.EstadoResponse;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import javax.net.ssl.SSLException;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 @Component
 public class EstadosClient extends WebClientTemplate {

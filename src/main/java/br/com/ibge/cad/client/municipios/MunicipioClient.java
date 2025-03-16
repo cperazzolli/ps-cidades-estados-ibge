@@ -9,13 +9,9 @@ import br.com.ibge.cad.domain.MunicipioResponse;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import javax.net.ssl.SSLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 @Component
 public class MunicipioClient extends WebClientTemplate {

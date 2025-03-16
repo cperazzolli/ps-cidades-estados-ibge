@@ -6,8 +6,6 @@ import br.com.ibge.cad.exception.BusinessException;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class MunicipioService {
 
