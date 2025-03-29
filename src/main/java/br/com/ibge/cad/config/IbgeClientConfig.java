@@ -12,14 +12,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
 @Configuration
 public class IbgeClientConfig {
 
     @Bean
     @Validated
     @IbgeClientProperties
-    @ConfigurationProperties("application.clients.ibge.estados-cidades")
-    public BaseClientProperties getIbgeClientProperties(){return new BaseClientProperties();}
+    @ConfigurationProperties("ibge.estados-client")
+    public BaseClientProperties ibgeEstadosClientProperties() {
+        return new BaseClientProperties();
+    }
 
     @Target({
             ElementType.FIELD,
@@ -30,5 +33,5 @@ public class IbgeClientConfig {
     })
     @Retention(RetentionPolicy.RUNTIME)
     @Qualifier
-    public @interface IbgeClientProperties{};
+    public @interface IbgeClientProperties {}
 }

@@ -9,10 +9,8 @@ spring:
     name: "ps-cidades-estados-ibge"
     version: "1.0.0"
     description: "Api de listagem de cidades atualizadas"
-logging:
-  level:
-    org.springframework.boot.context.properties: DEBUG
+
 ibge:
   estados-client:
-    base-url: https://servicodados.ibge.gov.br
-    timeout-in-seconds: 10
+    base-url: http://localhost:8080
+    timeout-in-seconds: 3

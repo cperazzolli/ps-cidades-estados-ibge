@@ -1,10 +1,15 @@
 package br.com.ibge.cad.service;
 
+import br.com.ibge.cad.client.ClientError;
+import br.com.ibge.cad.client.ClientResult;
 import br.com.ibge.cad.client.municipios.MunicipioClient;
-import br.com.ibge.cad.domain.MunicipioResponse;
+import br.com.ibge.cad.domain.EstadoDTO;
+import br.com.ibge.cad.domain.MunicipioDTO;
 import br.com.ibge.cad.exception.BusinessException;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MunicipioService {
@@ -16,14 +21,15 @@ public class MunicipioService {
         this.municipioClient = municipioClient;
     }
 
-    public MunicipioResponse findMunicipio(final @NotBlank String uf) {
+    public List<MunicipioDTO> findMunicipio(final @NotBlank String uf) {
 
-        final var municipioResponse = municipioClient.execute(uf);
+        final ClientResult<List<MunicipioDTO>, ClientError> result = municipioClient.find(uf);
 
-        if(municipioResponse == null) {
-            throw new BusinessException("Estados não rotornados.");
+        if (result.isSuccess()) {
+            return result.success();
         }
 
-        return  municipioResponse.success();
+        final var erro = result.error();
+        throw new BusinessException("Erro ao buscar estados: " + erro.message() + " (status: " + erro.statusCode() + ")");
     }
 }

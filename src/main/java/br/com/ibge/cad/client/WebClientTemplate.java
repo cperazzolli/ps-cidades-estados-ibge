@@ -2,8 +2,8 @@ package br.com.ibge.cad.client;
 
 import br.com.ibge.cad.config.ObjectMapperConfig;
 import br.com.ibge.cad.exception.RetryExhaustedException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.common.util.StringUtils;
+import br.com.ibge.cad.util.DefaultRecuperaProxy;
+import br.com.ibge.cad.util.JsonUtils;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -27,10 +27,13 @@ import reactor.util.retry.Retry;
 import reactor.util.retry.RetryBackoffSpec;
 
 import javax.net.ssl.SSLException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+
+import static br.com.ibge.cad.client.BaseClientProperties.getDefaultTimeout;
+
 
 @Slf4j
 public abstract class WebClientTemplate {
@@ -45,9 +48,7 @@ public abstract class WebClientTemplate {
     private final int retrievableMaxBackoffInSeconds;
     private final int retrievableMaxAttemps;
     private final double retrievableJitterFactor;
-    private final int timeoutInSeconds;
-
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final Integer timeout;
 
     protected WebClientTemplate(final BaseClientProperties properties) throws SSLException {
         this.baseUrl = properties.getBaseUrl();
@@ -56,18 +57,18 @@ public abstract class WebClientTemplate {
         this.retrievableMaxBackoffInSeconds = properties.getRetrievableMaxBackoffInSeconds();
         this.retrievableMaxAttemps = properties.getRetrievableMaxAttempts();
         this.retrievableJitterFactor = properties.getRetrievableMaxJitterFactor();
-        this.timeoutInSeconds = properties.getTimeoutInSeconds();
+        this.timeout = properties.getTimeoutInSeconds();
 
         final SslContext sslContext = SslContextBuilder.forClient()
                 .trustManager(InsecureTrustManagerFactory.INSTANCE)
                 .build();
 
         final HttpClient httpClient = HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Duration.ofSeconds(this.timeoutInSeconds).toMillisPart())
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) getTimeout().toMillis())
                 .secure(contextSpec -> contextSpec.sslContext(sslContext))
                 .doOnConnected(connection -> {
-                    connection.addHandlerLast(new ReadTimeoutHandler(this.timeoutInSeconds));
-                    connection.addHandlerLast(new WriteTimeoutHandler(this.timeoutInSeconds));
+                    connection.addHandlerLast(new ReadTimeoutHandler((int) getTimeout().toSeconds()));
+                    connection.addHandlerLast(new WriteTimeoutHandler((int) getTimeout().toSeconds()));
                 });
 
         final var encoder = new Jackson2JsonEncoder(ObjectMapperConfig.objectMapper());
@@ -82,7 +83,7 @@ public abstract class WebClientTemplate {
 
         this.webClient = WebClient.builder()
                 .baseUrl(properties.getBaseUrl())
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeaders(headers -> headers.addAll(defaultHeaders()))
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .exchangeStrategies(exchangeStrategies)
                 .build();
@@ -94,33 +95,32 @@ public abstract class WebClientTemplate {
                 .jitter(this.retrievableJitterFactor)
                 .filter(this::allowRetry)
                 .doBeforeRetry(retrySignal -> logRetry(retrySignal.totalRetries(), retrySignal.failure()))
-                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> throwsetryExchaustedException(retrySignal.totalRetries(), retrySignal.failure()));
+                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> throwRetryExhaustedException(retrySignal.totalRetries(), retrySignal.failure()));
 
-    }
-
-    protected Duration timeoutInSeconds() {
-        return Duration.ofSeconds(this.timeoutInSeconds);
     }
 
     protected <T> Function<WebClientResponseException, Mono<T>> fallbackResponseException() {
         return responseException -> {
-            if (HttpStatus.NOT_FOUND == HttpStatus.valueOf(responseException.getStatusCode().value())) {
+            final var status = responseException.getStatusCode();
+            if (status == HttpStatus.NOT_FOUND) {
                 return Mono.empty();
             }
-
-            if (HttpStatus.BAD_REQUEST == HttpStatus.valueOf(responseException.getStatusCode().value())) {
-                final var responseBodyError = responseException.getResponseBodyAsString(StandardCharsets.UTF_8);
-                if (StringUtils.isNotBlank(responseBodyError)) {
-                    log.warn("Trecho não recuperado");
-                    /*DefaultRecuperaProxy recuperaErrorResponse = objectMapper.readValue(responseBodyError, DefaultRecuperaProxy.class);
-                    final var recuperaErrorResponse = Optional.ofNullable(responseBodyError, DefaultRecuperaProxy);/*
-                    return recuperaErrorResponse.isPresent() && recuperaErrorResponse.get().isRecuperaInternalError() ? Mono.empty() : recuperaErrorResponse.get().isRecuperaInternalError() ;*/
-                    return Mono.empty();
-                }
-
+            if (status == HttpStatus.BAD_REQUEST) {
+                Mono.error(responseException);
+                /*final var responseBodyError = responseException.getMessage();
+                return Optional.ofNullable(JsonUtils.readValue(responseBodyError, DefaultRecuperaProxy.class))
+                        .filter(DefaultRecuperaProxy::isRecuperaInternalError)
+                        .map(error -> Mono.<T>empty())
+                        .orElseGet(() -> Mono.error(responseException));*/
             }
-            return Mono.error(responseException);
 
+            // Tratamento adicional para INTERNAL_SERVER_ERROR
+            if (status == HttpStatus.INTERNAL_SERVER_ERROR) {
+                log.warn("Retrying client {} : - cause: {}", this.baseUrl, responseException.getCause());
+                return Mono.error(new IllegalStateException("Erro interno do servidor ao acessar o recurso externo."));
+            }
+
+            return Mono.error(responseException);
         };
     }
 
@@ -132,12 +132,24 @@ public abstract class WebClientTemplate {
     }
 
     protected void logRetry(final long totalRetries, final Throwable failure) {
-
-        log.warn("Retrying client '{}':{}/{}", this.baseUrl, totalRetries + 1, this.retrievableMaxAttemps, failure);
+        log.warn("Retrying client '{}': attempt {}/{} - cause: {}", this.baseUrl, totalRetries + 1, this.retrievableMaxAttemps, failure.getMessage());
     }
 
-    protected Throwable throwsetryExchaustedException(final long totalRetries, final Throwable throwable) {
-        final String message = String.format("Retry client '%s' attemps", this.baseUrl, totalRetries);
+    protected Throwable throwRetryExhaustedException(final long totalRetries, final Throwable throwable) {
+        final String message = String.format("Retry client '%s' exhausted after %d attempts", this.baseUrl, totalRetries);
         return new RetryExhaustedException(message, throwable);
+    }
+
+    public Duration getTimeout() {
+        if (timeout == null || timeout <= 0) {
+            return getDefaultTimeout();
+        }
+        return Duration.ofSeconds(timeout);
+    }
+
+    protected HttpHeaders defaultHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
     }
 }
