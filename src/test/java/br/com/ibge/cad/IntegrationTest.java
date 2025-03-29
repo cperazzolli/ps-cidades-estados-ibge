@@ -20,5 +20,5 @@ public @interface IntegrationTest {
     Class<?>[] classes() default {};
 
     @AliasFor(annotation = SpringBootTest.class, attribute = "properties")
-    Class<?>[] properties() default {};
+    String[] properties() default {};
 }

@@ -1,11 +1,6 @@
 package br.com.ibge.cad.domain;
 
-import java.util.List;
-
-public record EstadoResponse (
-        List<Estado> data
-){
-    public record Estado(
+public record EstadoDTO(
         int id,
         String sigla,
         String nome,
@@ -18,4 +13,3 @@ public record EstadoResponse (
         ) {
         }
     }
-}

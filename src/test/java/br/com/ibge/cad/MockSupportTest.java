@@ -10,14 +10,14 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public abstract class MockSuportTest {
+public abstract class MockSupportTest {
 
     protected abstract List<Object> mocks();
 
     @BeforeEach
     void cleanUp() {
-        if(CollectionUtils.isEmpty(mocks())) {
-            Mockito.reset(mocks().toArray());
+        if (!CollectionUtils.isEmpty(mocks())) {
+            Mockito.reset(mocks().toArray(new Object[0]));
         }
         MDC.clear();
     }
